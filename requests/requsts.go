@@ -9,125 +9,123 @@ import (
 type Response struct {
 	URL  string
 	Text []byte
+	resp http.Response
 }
 
-func Get(url string) Response {
+func Get(url string) (Response, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
+
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
+	defer resp.Body.Close()
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
-
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
 
-func Post(url string, bytesBody []byte) Response {
+func Post(url, contentType string, bytesBody []byte) (Response, error) {
 	body := bytes.NewReader(bytesBody)
 
-	resp, err := http.Post(url, "application/octet-stream", body)
+	resp, err := http.Post(url, contentType, body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
+	defer resp.Body.Close()
 
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
 
-func Put(url string, bytesBody []byte) Response {
+func Put(url string, bytesBody []byte) (Response, error) {
 	body := bytes.NewReader(bytesBody)
 
-	resp, err := http.NewRequest(http.MethodPut, url, body)
+	req, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return Response{}, err
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
+	defer resp.Body.Close()
 
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
 
-func Delete(url string, bytesBody []byte) Response {
+func Delete(url string, bytesBody []byte) (Response, error) {
 	body := bytes.NewReader(bytesBody)
 
-	resp, err := http.NewRequest(http.MethodDelete, url, body)
+	req, err := http.NewRequest(http.MethodDelete, url, body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return Response{}, err
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
+	defer resp.Body.Close()
 
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
 
-func Head(url string) Response {
+func Head(url string) (Response, error) {
 	resp, err := http.Head(url)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
+	defer resp.Body.Close()
 
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
 
-func Options(url string, bytesBody []byte) Response {
+func Options(url string, bytesBody []byte) (Response, error) {
 	body := bytes.NewReader(bytesBody)
 
-	resp, err := http.NewRequest(http.MethodOptions, url, body)
+	req, err := http.NewRequest(http.MethodOptions, url, body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return Response{}, err
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{url, []byte(err.Error())}
+		return Response{}, err
 	}
 
-	err = resp.Body.Close()
-	if err != nil {
-		return Response{url, []byte(err.Error())}
-	}
+	defer resp.Body.Close()
 
-	return Response{url, data}
+	return Response{url, data, *resp}, nil
 }
